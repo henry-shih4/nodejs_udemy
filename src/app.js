@@ -24,7 +24,7 @@ app.use("/api/v1", jobs);
 //Middlewares to handle errors
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT} in ${process.env.NODE_ENV} mode`);
