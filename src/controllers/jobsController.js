@@ -1,6 +1,8 @@
 const jobs = require("../models/jobs");
 const Job = require("../models/jobs");
 const geoCoder = require("../utils/geocoder");
+const ErrorHandler = require("../utils/errorHandler");
+const mongoose = require("mongoose");
 
 //Get all jobs => /api/v1/jobs
 exports.getJobs = async (req, res, next) => {
@@ -22,7 +24,7 @@ exports.getSingleJob = async (req, res, next) => {
   });
 
   if (!job || job.length === 0) {
-    return res.status(404).json({ success: false, message: "Job not found" });
+    return next(new ErrorHandler("Job not found", 404));
   }
   res.status(200).json({ succes: true, data: job });
 };
@@ -66,12 +68,13 @@ exports.getJobsInRadius = async (req, res, next) => {
 //update a job /api/v1/job/:id
 
 exports.updateJob = async (req, res, next) => {
-  let job = await Job.findById(req.params.id);
+  let jobId = req.params.id;
+  console.log(jobId);
+  let job = await Job.findById(jobId);
+
   if (!job) {
-    res.status(404).json({
-      success: false,
-      message: "Job was not found",
-    });
+    console.log("no job");
+    return next(new ErrorHandler("Job not found", 404));
   }
   job = await Job.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
