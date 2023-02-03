@@ -1,4 +1,3 @@
-const jobs = require("../models/jobs");
 const Job = require("../models/jobs");
 const geoCoder = require("../utils/geocoder");
 const ErrorHandler = require("../utils/errorHandler");

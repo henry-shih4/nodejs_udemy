@@ -31,6 +31,13 @@ module.exports = (err, req, res, next) => {
       error = new ErrorHandler(message, 400);
     }
 
+    if (err.code === 11000) {
+      const message = `That ${Object.keys(
+        err.keyValue
+      )} is already registered!`;
+      error = new ErrorHandler(message, 400);
+    }
+
     res.status(error.statusCode).json({
       success: false,
       message: error.message || "Internal Server Error",
