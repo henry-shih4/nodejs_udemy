@@ -70,9 +70,9 @@ exports.getJobsInRadius = catchAsyncErrors(async (req, res, next) => {
 
 exports.updateJob = catchAsyncErrors(async (req, res, next) => {
   let jobId = req.params.id;
-  if (!mongoose.Types.ObjectId.isValid(jobId)) {
-    return next(new ErrorHandler("Invalid job id", 403));
-  }
+  // if (!mongoose.Types.ObjectId.isValid(jobId)) {
+  //   return next(new ErrorHandler("Invalid job id", 404));
+  // }
   let job = await Job.findById(jobId);
   if (!job) {
     return next(new ErrorHandler("Job not found", 404));
@@ -93,9 +93,7 @@ exports.updateJob = catchAsyncErrors(async (req, res, next) => {
 
 exports.deleteJob = catchAsyncErrors(async (req, res, next) => {
   let jobId = req.params.id;
-  if (!mongoose.Types.ObjectId.isValid(jobId)) {
-    return next(new ErrorHandler("Invalid job id", 403));
-  }
+
   let job = await Job.findById(jobId);
   if (!job) {
     return next(new ErrorHandler("Job not found", 404));
@@ -112,7 +110,6 @@ exports.deleteJob = catchAsyncErrors(async (req, res, next) => {
 //get stats
 
 exports.jobStats = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.params.topic);
   const stats = await Job.aggregate([
     {
       $match: { $text: { $search: '"' + req.params.topic + '"' } },
@@ -130,10 +127,9 @@ exports.jobStats = catchAsyncErrors(async (req, res, next) => {
   ]);
 
   if (stats.length === 0) {
-    return res.status(404).json({
-      success: false,
-      message: `No stats found for ${req.params.topic}`,
-    });
+    return next(
+      new ErrorHandler(`No stats found for - ${req.params.topic}`, 404)
+    );
   }
 
   res.status(200).json({

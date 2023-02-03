@@ -11,17 +11,29 @@ module.exports = (err, req, res, next) => {
       stack: err.stack,
     });
   }
+
+  //production errors, what we want user to see.
   if (process.env.NODE_ENV === "production ") {
     let error = { ...err };
     error.message = err.message;
-    // Wrong mongoose object ID error
-    // if (err.name === "CastError") {
-    //   const message = `Resource not found. Invalid: ${err.path}`;
-    //   error = new ErrorHandler(message, 404);
-    // }
-    res.status(err.statusCode).json({
+
+    //Wrong mongoose object ID error
+    if (err.name === "CastError") {
+      const message = `Resource not found. Invalid: ${err.path}`;
+      error = new ErrorHandler(message, 404);
+    }
+
+    //Validation Error
+    if (err.name === "ValidationError") {
+      const message = Object.values(err.errors).map((value) => {
+        return ` ${value.message}`;
+      });
+      error = new ErrorHandler(message, 400);
+    }
+
+    res.status(error.statusCode).json({
       success: false,
-      message: err.message || "Internal Server Error",
+      message: error.message || "Internal Server Error",
     });
   }
 };

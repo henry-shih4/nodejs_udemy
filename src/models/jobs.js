@@ -45,7 +45,8 @@ const jobSchema = new mongoose.Schema({
   },
   industry: {
     type: [String],
-    required: [true, "Please enter the category of the job"],
+    default: undefined,
+    required: [true, "Please enter the industry of the job"],
     enum: {
       values: [
         "Business",
@@ -55,12 +56,12 @@ const jobSchema = new mongoose.Schema({
         "Human Resources",
         "Other",
       ],
-      message: "Please select an option for industry",
+      message: "Please select a valid option for industry",
     },
   },
   jobType: {
     type: String,
-    required: [true, "Please enter a job type"],
+    required: [true, "Please enter a job type."],
     enum: {
       values: ["Full Time", "Contract", "Part Time", "Internship"],
       message: "Please select an option for job type",
@@ -68,7 +69,7 @@ const jobSchema = new mongoose.Schema({
   },
   minEducation: {
     type: String,
-    required: true,
+    required: [true, "Please enter minimum education required for this job."],
     enum: {
       values: ["Bachelors", "Masters", "Phd"],
       message: "Please select an option for education",
@@ -80,7 +81,7 @@ const jobSchema = new mongoose.Schema({
   },
   experience: {
     type: String,
-    required: true,
+    required: [true, "Please enter experience required for this job."],
     enum: {
       values: [
         "No experience",
@@ -88,12 +89,12 @@ const jobSchema = new mongoose.Schema({
         "2 Years to 5 Years",
         "5 Years+",
       ],
-      message: "please select correct options for experience",
+      message: "Please select a correct option for experience.",
     },
   },
   salary: {
     type: Number,
-    required: [true, "please enter expected salary for this job"],
+    required: [true, "Please enter expected salary for this job."],
   },
   postingDate: {
     type: Date,
