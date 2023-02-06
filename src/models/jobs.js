@@ -108,6 +108,11 @@ const jobSchema = new mongoose.Schema({
     type: [Object],
     select: false,
   },
+  postingUser: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 //creating job slug before saving to DB
