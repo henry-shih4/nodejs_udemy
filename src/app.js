@@ -4,12 +4,15 @@ const app = express();
 //global error handling
 
 const dotenv = require("dotenv");
+const cookieParser = require('cookie-parser');
+
 const connectDatabase = require("../config/database");
 const errorMiddleware = require("../middlewares/errors");
 const ErrorHandler = require("./utils/errorHandler");
 
 //setting up config.env file variables
 dotenv.config({ path: "./config/.env" });
+
 
 //Handing uncaught exception error
 process.on("uncaughtException", (err) => {
@@ -23,6 +26,9 @@ connectDatabase();
 
 //setUp body parser
 app.use(express.json());
+
+//Set cookie parser
+app.use(cookieParser());
 
 //Importing Routes
 const jobs = require("./routes/jobs");
