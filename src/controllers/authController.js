@@ -118,7 +118,9 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new ErrorHandler("Password reset token is invalid.", 400));
+    return next(
+      new ErrorHandler("Password reset token is invalid or has expired.", 400)
+    );
   }
 
   //Setup new password
@@ -129,4 +131,16 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
   await user.save();
   sendToken(user, 200, res);
+});
+
+/// Logout user => /api/v1/logout
+exports.logout = catchAsyncErrors(async (req, res, next) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    success: true,
+    message: "User has been logged out successfuly",
+  });
 });

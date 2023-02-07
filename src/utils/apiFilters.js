@@ -6,7 +6,7 @@ class APIFilters {
 
   filter() {
     const queryCopy = { ...this.queryString };
-    console.log(queryCopy);
+    // console.log(queryCopy);
     //remove fields from query
     const removeFields = ["sort", "fields", "q", "limit", "page"];
     removeFields.forEach((element) => delete queryCopy[element]);
@@ -18,13 +18,13 @@ class APIFilters {
       (match) => `$${match}`
     );
 
-    console.log(JSON.parse(queryString));
+    // console.log(JSON.parse(queryString));
     this.query = this.query.find(JSON.parse(queryString));
     return this;
   }
 
   sort() {
-    console.log(this.queryString);
+    // console.log(this.queryString);
 
     if (this.queryString.sort) {
       const sortBy = this.queryString.sort.split(",").join(" ");

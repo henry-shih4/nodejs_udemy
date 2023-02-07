@@ -55,8 +55,8 @@ exports.newJob = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//search jobs within radius => /api/v1/jobs/location/:zipcode/:distance
 
+//search jobs within radius => /api/v1/jobs/location/:zipcode/:distance
 exports.getJobsInRadius = catchAsyncErrors(async (req, res, next) => {
   const { zipcode, distance } = req.params;
   console.log(zipcode, distance);
