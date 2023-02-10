@@ -4,7 +4,7 @@ const app = express();
 //global error handling
 
 const dotenv = require("dotenv");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 
 const connectDatabase = require("../config/database");
 const errorMiddleware = require("../middlewares/errors");
@@ -12,7 +12,6 @@ const ErrorHandler = require("./utils/errorHandler");
 
 //setting up config.env file variables
 dotenv.config({ path: "./config/.env" });
-
 
 //Handing uncaught exception error
 process.on("uncaughtException", (err) => {
@@ -33,8 +32,10 @@ app.use(cookieParser());
 //Importing Routes
 const jobs = require("./routes/jobs");
 const auth = require("./routes/auth");
+const user = require("./routes/user");
 app.use("/api/v1", jobs);
 app.use("/api/v1", auth);
+app.use("/api/v1", user);
 
 //Handle unhandled routes *make sure under app.use
 app.all("*", (req, res, next) => {
