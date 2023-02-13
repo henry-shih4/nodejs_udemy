@@ -167,10 +167,11 @@ exports.applyJob = catchAsyncErrors(async (req, res, next) => {
   }
 
   // check if user has applied already
+
   if (
     job.applicantsApplied.filter((applicant) => {
-      applicant.id === req.user.id;
-    })
+      return applicant.id === req.user.id;
+    }).length > 0
   ) {
     return next(new ErrorHandler("You have already applied to this job.", 400));
   }

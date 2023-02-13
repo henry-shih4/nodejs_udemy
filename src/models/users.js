@@ -4,40 +4,46 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, "Please enter a username"],
-    unique: true,
-    index: true,
-  },
-  email: {
-    type: String,
-    required: [true, "Please enter your email address"],
-    unique: true,
-    validate: [validator.isEmail, "Please enter a valid email address"],
-  },
-  role: {
-    type: String,
-    enum: {
-      values: ["user", "admin"],
-      message: "Please select a correct role",
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: [true, "Please enter a username"],
+      unique: true,
+      index: true,
     },
-    default: "user",
+    email: {
+      type: String,
+      required: [true, "Please enter your email address"],
+      unique: true,
+      validate: [validator.isEmail, "Please enter a valid email address"],
+    },
+    role: {
+      type: String,
+      enum: {
+        values: ["user", "admin"],
+        message: "Please select a correct role",
+      },
+      default: "user",
+    },
+    password: {
+      type: String,
+      required: [true, "Please enter a password"],
+      minLength: [8, "Your password must be at least 8 characters."],
+      select: false,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
-  password: {
-    type: String,
-    required: [true, "Please enter a password"],
-    minLength: [8, "Your password must be at least 8 characters."],
-    select: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
 
 //Encrypting password before saving
 userSchema.pre("save", async function (next) {
@@ -77,5 +83,14 @@ userSchema.methods.getResetPasswordToken = function () {
   this.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
   return resetToken;
 };
+
+//show all jobs created by user using virtuals
+
+userSchema.virtual("jobsPublished", {
+  ref: "Job",
+  localField: "_id",
+  foreignField: "postingUser",
+  justOne: false,
+});
 
 module.exports = mongoose.model("User", userSchema);
