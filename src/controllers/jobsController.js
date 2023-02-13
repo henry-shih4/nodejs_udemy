@@ -154,7 +154,7 @@ exports.jobStats = catchAsyncErrors(async (req, res, next) => {
 // apply to job using resume => /api/v1/job/:id/apply
 
 exports.applyJob = catchAsyncErrors(async (req, res, next) => {
-  let job = await Job.findById(req.params.id);
+  let job = await Job.findById(req.params.id).select("+applicantsApplied");
 
   if (!job) {
     return next(new ErrorHandler("Job not found", 404));
@@ -164,6 +164,15 @@ exports.applyJob = catchAsyncErrors(async (req, res, next) => {
 
   if (job.lastDate < new Date(Date.now())) {
     return next(new ErrorHandler("Job posting date has passed", 400));
+  }
+
+  // check if user has applied already
+  if (
+    job.applicantsApplied.filter((applicant) => {
+      applicant.id === req.user.id;
+    })
+  ) {
+    return next(new ErrorHandler("You have already applied to this job.", 400));
   }
 
   //check files
@@ -213,11 +222,9 @@ exports.applyJob = catchAsyncErrors(async (req, res, next) => {
       { new: true, runValidators: true, useFindAndMondify: false }
     );
   });
-  res
-    .status(200)
-    .json({
-      success: true,
-      message: "Applied to Job successfully",
-      data: file.name,
-    });
+  res.status(200).json({
+    success: true,
+    message: "Applied to Job successfully",
+    data: file.name,
+  });
 });

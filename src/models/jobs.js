@@ -102,9 +102,9 @@ const jobSchema = new mongoose.Schema({
   },
   lastDate: {
     type: Date,
-    default: new Date().setDate(new Date().getDate() + 7),
+    default: new Date().setDate(new Date().getDate() + 14),
   },
-  appicantsApplied: {
+  applicantsApplied: {
     type: [Object],
     select: false,
   },
