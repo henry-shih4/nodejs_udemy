@@ -11,6 +11,7 @@ const {
   deleteJob,
   getSingleJob,
   jobStats,
+  applyJob,
 } = require("../controllers/jobsController");
 
 const {
@@ -35,6 +36,10 @@ router
   .route("/jobs/:id")
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteJob);
 
-router.route("/stats/:topic").get(jobStats);
+router.route("/stats/:topic").get(isAuthenticatedUser, jobStats);
+
+router
+  .route("/jobs/:id/apply")
+  .put(isAuthenticatedUser, authorizeRoles("user"), applyJob);
 
 module.exports = router;

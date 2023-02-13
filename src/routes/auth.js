@@ -15,10 +15,11 @@ const {
 } = require("../controllers/authController");
 
 router.route("/register").post(registerUser);
-router.route("/users").get(getUsers);
+router.route("/users").get(isAuthenticatedUser, getUsers);
+
 router.route("/login").post(loginUser);
-router.route("/password/forgot").post(forgotPassword);
-router.route("/password/reset/:token").put(resetPassword);
+router.route("/password/forgot").post(isAuthenticatedUser, forgotPassword);
+router.route("/password/reset/:token").put(isAuthenticatedUser, resetPassword);
 router.route("/logout").get(isAuthenticatedUser, logout);
 
 module.exports = router;

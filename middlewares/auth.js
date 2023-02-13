@@ -14,14 +14,13 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
   }
-
   if (token === "null") {
     return next(new ErrorHandler("Login first to access this resource", 401));
+  } else {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id);
+    next();
   }
-
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  req.user = await User.findById(decoded.id);
-  next();
 });
 
 exports.authorizeRoles = (...roles) => {
