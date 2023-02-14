@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const catchAsyncErrors = require("../../middlewares/catchAsyncErrors");
 const APIFilters = require("../utils/apiFilters");
 const path = require("path");
+const fs = require("fs");
 
 //Get all jobs => /api/v1/jobs
 exports.getJobs = catchAsyncErrors(async (req, res, next) => {
@@ -114,9 +115,33 @@ exports.updateJob = catchAsyncErrors(async (req, res, next) => {
 exports.deleteJob = catchAsyncErrors(async (req, res, next) => {
   let jobId = req.params.id;
 
-  let job = await Job.findById(jobId);
+  let job = await Job.findById(jobId).select("+applicantsApplied");
   if (!job) {
     return next(new ErrorHandler("Job not found", 404));
+  }
+
+  //check if user is the owner of the job
+  if (job.postingUser.toString() !== req.user.id) {
+    return next(
+      new ErrorHandler(
+        `User(${req.user.id}) does not match. You are not allowed to delete this field.`
+      )
+    );
+  }
+
+  //delete files associated with the job
+
+  for (let i = 0; i < job.applicantsApplied.length; i++) {
+    let filepath = path.join(
+      __dirname,
+      "../../",
+      "public",
+      "uploads",
+      `${job.applicantsApplied[i].resume}`
+    );
+    fs.unlink(filepath, (err) => {
+      if (err) return console.log(err);
+    });
   }
 
   job = await Job.findByIdAndDelete({ _id: jobId });
