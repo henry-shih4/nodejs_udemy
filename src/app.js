@@ -6,6 +6,11 @@ const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xssClean = require("xss-clean");
+const hpp = require("hpp");
 
 const connectDatabase = require("../config/database");
 const errorMiddleware = require("../middlewares/errors");
@@ -24,6 +29,9 @@ process.on("uncaughtException", (err) => {
 //connect to database
 connectDatabase();
 
+//Setup security headers
+app.use(helmet());
+
 //setUp body parser
 app.use(express.json());
 
@@ -32,6 +40,26 @@ app.use(cookieParser());
 
 //handle file upload
 app.use(fileUpload());
+
+//sanitize data
+app.use(mongoSanitize());
+
+//prevent XSS attacks
+app.use(xssClean());
+
+//prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: ["positions"],
+  })
+);
+
+//rate limiting
+const limiter = rateLimit({
+  windowsMs: 10 * 60 * 1000, //10 min
+  max: 100,
+});
+app.use(limiter);
 
 //Importing Routes
 const jobs = require("./routes/jobs");

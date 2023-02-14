@@ -164,7 +164,7 @@ async function deleteUserData(user, role) {
         1
       );
 
-      appliedJobs[i].save();
+      await appliedJobs[i].save();
     }
   }
 }
