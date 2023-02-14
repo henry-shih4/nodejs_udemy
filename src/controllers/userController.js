@@ -4,6 +4,7 @@ const catchAsyncErrors = require("../../middlewares/catchAsyncErrors");
 const ErrorHandler = require("../utils/errorHandler");
 path = require("path");
 const fs = require("fs");
+const APIFilters = require("../utils/apiFilters");
 
 //get current user profile => /api/v1/profile
 
@@ -55,8 +56,25 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
     .json({ success: true, message: "user updated successfully", data: user });
 });
 
-//delete current user. ==> /api/v1/profile/delete
+//get all users (only super user)==> /api/v1/users
+exports.getUsers = catchAsyncErrors(async (req, res, next) => {
+  const apiFilters = new APIFilters(User.find(), req.query);
+  apiFilters.filter();
+  apiFilters.sort();
+  apiFilters.limitFields();
+  apiFilters.searchByQuery();
+  apiFilters.pagination();
 
+  const users = await apiFilters.query;
+
+  res.status(200).json({
+    success: true,
+    reults: users.length,
+    data: { users },
+  });
+});
+
+//delete current user. ==> /api/v1/profile/delete
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   deleteUserData(req.user.id, req.user.role);
 
@@ -73,10 +91,46 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//show all jobs published by an employer => /api/v1/jobs/published
+exports.getPublishedJobs = catchAsyncErrors(async (req, res, next) => {
+  let jobs = await Job.find({ postingUser: req.user.id });
+  res.status(200).json({ success: true, results: jobs.length, data: jobs });
+});
+
+//show all applied jobs by a user => /api/v1/jobs/applied
+exports.getAppliedJobs = catchAsyncErrors(async (req, res, next) => {
+  let jobs = await Job.find({ "applicantsApplied.id": req.user.id }).select(
+    "+applicantsApplied"
+  );
+  res.status(200).json({ success: true, results: jobs.length, data: jobs });
+});
+
+//delete a single user only by super user => /api/v1/users/:id/delete
+
+exports.deleteSingleUser = catchAsyncErrors(async (req, res, next) => {
+  let userId = req.params.id;
+  let user = await User.findById(userId);
+  // console.log(user);
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  deleteUserData(user.id, user.role);
+
+  user = await User.findByIdAndDelete({ _id: userId });
+  res.status(200).json({
+    success: true,
+    message: `User ${user.username}: ${user.id} has been deleted by a super user.`,
+  });
+});
+
+//delete current user data function
+
 async function deleteUserData(user, role) {
   //delete jobs as admin
   if (role === "admin") {
-    await Job.deleteMany({ user: user });
+    await Job.deleteMany({ postingUser: user });
   }
 
   //delete files related to user
@@ -105,11 +159,12 @@ async function deleteUserData(user, role) {
         if (err) return console.log(err);
       });
 
-      // appliedJobs[i].applicantsApplied.splice(
-      //   appliedJobs[i].applicantsApplied.indexOf(obj.id)
-      // );
+      appliedJobs[i].applicantsApplied.splice(
+        appliedJobs[i].applicantsApplied.indexOf(obj),
+        1
+      );
 
-      // appliedJobs[i].save();
+      appliedJobs[i].save();
     }
   }
 }

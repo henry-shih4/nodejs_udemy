@@ -30,11 +30,11 @@ router.route("/jobs/location/:zipcode/:distance").get(getJobsInRadius);
 
 router
   .route("/jobs/:id")
-  .put(isAuthenticatedUser, authorizeRoles("admin"), updateJob);
+  .put(isAuthenticatedUser, authorizeRoles("admin", "super"), updateJob);
 
 router
   .route("/jobs/:id")
-  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteJob);
+  .delete(isAuthenticatedUser, authorizeRoles("admin", "super"), deleteJob);
 
 router.route("/stats/:topic").get(isAuthenticatedUser, jobStats);
 

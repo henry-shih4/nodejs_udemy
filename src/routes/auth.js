@@ -7,7 +7,6 @@ const {
 
 const {
   registerUser,
-  getUsers,
   loginUser,
   forgotPassword,
   resetPassword,
@@ -15,7 +14,6 @@ const {
 } = require("../controllers/authController");
 
 router.route("/register").post(registerUser);
-router.route("/users").get(isAuthenticatedUser, getUsers);
 
 router.route("/login").post(loginUser);
 router.route("/password/forgot").post(isAuthenticatedUser, forgotPassword);

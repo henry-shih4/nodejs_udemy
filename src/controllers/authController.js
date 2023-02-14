@@ -16,19 +16,14 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     role,
   });
 
-  sendToken(user, 200, res);
+  res
+    .status(200)
+    .json({
+      success: true,
+      message: `New user created: ${req.body.username}. Please log in.`,
+    });
 });
 
-//get users ==> /api/v1/users
-
-exports.getUsers = catchAsyncErrors(async (req, res, next) => {
-  const users = await User.find();
-  res.status(200).json({
-    success: true,
-    reults: users.length,
-    data: { users },
-  });
-});
 
 //Login user /api/v1/login
 
@@ -144,3 +139,4 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
     message: "User has been logged out successfuly",
   });
 });
+

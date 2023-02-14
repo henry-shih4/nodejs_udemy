@@ -7,7 +7,7 @@ const ErrorHandler = require("../src/utils/errorHandler");
 //check if user is authenticated or not
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  let token = null;
+  let token = "null";
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")

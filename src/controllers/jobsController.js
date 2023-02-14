@@ -33,7 +33,7 @@ exports.getSingleJob = catchAsyncErrors(async (req, res, next) => {
   let jobId = req.params.id;
   let job = await Job.find({
     $and: [{ _id: jobId }, { slug: req.params.slug }],
-  });
+  }).populate({ path: "postingUser", select: "username" });
 
   if (!job || job.length === 0) {
     return next(new ErrorHandler("Job not found", 404));
@@ -83,13 +83,20 @@ exports.getJobsInRadius = catchAsyncErrors(async (req, res, next) => {
 
 exports.updateJob = catchAsyncErrors(async (req, res, next) => {
   let jobId = req.params.id;
-  // if (!mongoose.Types.ObjectId.isValid(jobId)) {
-  //   return next(new ErrorHandler("Invalid job id", 404));
-  // }
+
   let job = await Job.findById(jobId);
   if (!job) {
     return next(new ErrorHandler("Job not found", 404));
   }
+
+  if (job.postingUser.toString() !== req.user.id) {
+    return next(
+      new ErrorHandler(
+        `User(${req.user.id}) does not match. You are not allowed to update this field.`
+      )
+    );
+  }
+
   job = await Job.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
