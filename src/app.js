@@ -97,4 +97,3 @@ process.on("unhandledRejection", (err) => {
 });
 /////////
 
-app.get("/", (req, res) => res.send("Welcome to Job API"));

@@ -19,6 +19,8 @@ const {
   authorizeRoles,
 } = require("../../middlewares/auth");
 
+
+router.get("/", (req, res) => res.status(200).json({success:true, message:'Welcome to job api'}));
 router.route("/jobs").get(getJobs);
 router.route("/jobs/:id/:slug").get(getSingleJob);
 
