@@ -11,7 +11,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xssClean = require("xss-clean");
 const hpp = require("hpp");
-const cors = require('cors')
+const cors = require("cors");
 
 const connectDatabase = require("../config/database");
 const errorMiddleware = require("../middlewares/errors");
@@ -63,7 +63,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 //setting up cors - access from other domains
-app.use(cors())
+app.use(cors());
 
 //Importing Routes
 const jobs = require("./routes/jobs");
@@ -96,3 +96,5 @@ process.on("unhandledRejection", (err) => {
   });
 });
 /////////
+
+app.get("/", (req, res) => res.send("Welcome to Job API"));
